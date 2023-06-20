@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:my_digital_library/constants/constants.dart';
-import 'package:my_digital_library/pages/home/widgets/iconButtonAction.dart';
-
 import 'package:my_digital_library/widgets/customTabBar.dart';
 import 'package:my_digital_library/widgets/bookStaggeredGridView.dart';
-
 import '../../widgets/bottomNavBar.dart';
-
-
-//import 'package:deneme/ui/appbar/appbar.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import '../auth/auth.dart';
 
 class homePage extends StatefulWidget {
   const homePage({Key? key}) : super(key: key);
@@ -19,11 +16,107 @@ class homePage extends StatefulWidget {
 }
 
 class _homePageState extends State<homePage> {
+  void initializeHive() async {
+    await Hive.initFlutter();
+    Hive.openBox('favorites_v01');
+    Hive.openBox('library_v01');
+  }
+
 
 
   var bottomIndex = 0;
   var tabIndex = 0;
   final  pageController = PageController();
+  final User? user = Auth().currentUser;
+  Future<void> signOut() async{
+    final myBox = Hive.box('favorites_v01');
+    final myBoxLib = Hive.box('library_v01');
+
+    myBox.clear();
+    myBoxLib.clear();
+    await Auth().signOut();
+  }
+
+  String _userId(){
+    return user?.email!.split('@')[0] ?? 'User email';
+  }
+  Widget _signOutButton(){
+    return Padding(
+      padding:EdgeInsets.fromLTRB(8, 8, 0, 8) ,
+      child: Container(
+        margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+        child: ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStatePropertyAll<Color>(Colors.grey[200]!),
+
+          ),
+
+          onPressed: signOut,
+          child: const Text('Sign Out',
+            style: TextStyle(
+              color: mainScreenProperties.fontColor,
+
+            ),
+          ),
+
+
+        ),
+      ),
+    );
+
+  }
+
+  AppBar _buildBuildAppBar(width,email,) {
+    return AppBar(
+      //toolbarHeight: height,
+      elevation: appBarProperties.elevation,
+      backgroundColor: appBarProperties.color,
+
+      title: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: Container(width: 40, height: 40,child: Image.asset('assets/images/default_image.png')),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+
+                Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: Text('DigiLib',style: TextStyle(
+                      color: Colors.black
+                  ),),
+                ),
+                Container(
+                  //margin: EdgeInsets.fromLTRB(40, 0, 0, 0),
+                  child: Text('$email: $width',style: TextStyle(
+                    color: Colors.black.withOpacity(.5),
+                    fontSize: 13,
+                    fontWeight: FontWeight.normal,
+                  ),),
+                ) ,
+              ],
+            ),
+
+
+          ],
+        ),
+      ) ,
+
+      centerTitle: true,
+      actions: [
+        //iconButtonAction(),
+        _signOutButton(),
+
+
+      ],
+
+    );
+  }
+
 
   // json decoder content
 
@@ -39,7 +132,7 @@ class _homePageState extends State<homePage> {
     return Scaffold(
 
       backgroundColor: mainScreenProperties.backgroundColor,
-      appBar: _buildBuildAppBar(width),
+      appBar: _buildBuildAppBar(width,_userId()),
       body: _buildBody(),
     bottomNavigationBar: bottomNavBar(bottomIndex: bottomIndex)  ,//_buidBottomNavigationBar(width),
 
@@ -74,22 +167,6 @@ class _homePageState extends State<homePage> {
 }
 
 
-AppBar _buildBuildAppBar(width) {
-  return AppBar(
-    //toolbarHeight: height,
-    elevation: appBarProperties.elevation,
-    backgroundColor: appBarProperties.color,
-    title: Text('screen width: $width',style: TextStyle(
-      color: Colors.black
-    ),) ,//appBarProperties.title,
-    centerTitle: true,
-    actions: [
-      iconButtonAction(),
-
-    ],
-
-  );
-}
 
 
 
@@ -108,71 +185,3 @@ AppBar _buildBuildAppBar(width) {
 
 
 
-/*
-
-  Widget _buidBottomNavigationBar(width) {
-     final List bottoms = bottomNavigationBar.navBarItems;
-
-
-    return Container(
-      color: Colors.grey[200],
-      width: width,
-      height: 56,
-
-      child: ListView.separated(
-
-
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (_, index) => GestureDetector(
-            onTap: () {
-
-              if (index == 1){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => sourcesHome()));
-
-              }
-              else if (index == 2){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => sourcesHome()));
-
-              }
-              else{
-
-                setState(() {
-                  bottomIndex = index;
-
-                });
-
-              }
-
-
-            } ,
-            child: Container(
-
-
-              width: (width-40)/bottoms.length,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: bottomIndex == index ?
-              const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-
-                    width: 3,
-                    color: Colors.deepOrange,
-                  ),
-                ),
-              ):null,
-              child: Icon(bottoms[index],
-
-              size:30,
-                color: bottomIndex == index ? mainScreenProperties.fontColor: Colors.grey[400] ,
-              ),
-
-            ),
-          ),
-          separatorBuilder: (_, index) => const SizedBox(width: 10,),
-          itemCount: bottoms.length),
-    );
-  }
-
-
-
- */

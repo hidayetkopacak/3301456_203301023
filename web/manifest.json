@@ -1,11 +1,11 @@
 {
-    "name": "my_digital_library",
-    "short_name": "my_digital_library",
+    "name": "DigiLib",
+    "short_name": "DigiLib",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Open source flutter comic, manga, book app.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

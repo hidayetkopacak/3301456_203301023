@@ -1,123 +1,143 @@
 import 'package:flutter/material.dart';
+
 import 'package:my_digital_library/constants/constants.dart';
-import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:photo_view/photo_view.dart';
 
 class singleIssueSlider extends StatefulWidget {
   final String issueName;
   final List<String> issuePages;
-  const singleIssueSlider({required this.issueName,required this.issuePages,Key? key}) : super(key: key);
+
+  const singleIssueSlider({required this.issueName, required this.issuePages, Key? key})
+      : super(key: key);
 
   @override
   State<singleIssueSlider> createState() => _singleIssueSliderState();
 }
 
 class _singleIssueSliderState extends State<singleIssueSlider> {
-
-  int? pagePosition;
-
-  @override
-  void initState() {
-    super.initState();
-    pagePosition = 0;
-  }
-
-
-
+  bool _isAppBarVisible = true;
+  bool _isBottomNavBarVisible = true;
+  int pagePosition = 0;
+  PageController pageController = PageController(initialPage: 0);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight+30),
+        child: AnimatedContainer(
 
-      appBar: _buildBuildAppBar(widget.issueName,context),
-      body: ImageSlideshow(
-        height: double.infinity,
-        initialPage: 0,
-        indicatorColor: mainScreenProperties.fontColor,
-        indicatorBackgroundColor: mainScreenProperties.backgroundColorSecond,
-        children: [
-          //for(var i=0; i<widget.issuePages.length; i++) bozulursa alttaki döngüyü sil bunu al
-          //Image.network(widget.issuePages[i]),
+          height: _isAppBarVisible ? kToolbarHeight+30 : 0,
 
-
-
-
-          for(var i=0; i<widget.issuePages.length; i++)
-            CachedNetworkImage(
-              imageUrl: widget.issuePages[i],
-              placeholder: (context, url) => Center(child: SizedBox(width:50, height:50,child: CircularProgressIndicator(color: Colors.grey,))),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            ),
-
-        ],
-        onPageChanged: (value) {
+          duration: Duration(milliseconds: 200),
+          child: _buildBuildAppBar(widget.issueName, context),
+        ),
+      ),
+      // Diğer widget'lar...
+      body: GestureDetector(
+        onTap: () {
           setState(() {
-            this.pagePosition = value.toInt();
+            _isAppBarVisible = !_isAppBarVisible;
+            _isBottomNavBarVisible = !_isBottomNavBarVisible;
           });
-
-          print('Page changed: $value');
         },
+        child: Container(
+          color: Colors.black,
+          child: PageView.builder(
 
-      ),
-      bottomNavigationBar: buildBottomNavBar(pagePosition,widget.issuePages.length),
-
-
-    );
-  }
-
-  Container buildPageViewBuilder() {
-    return Container(
-      child: PageView.builder(
-
-          itemCount: widget.issuePages.length,
-          itemBuilder: (context,pagePosition){
-            this.pagePosition = pagePosition;
-            return Container(
-              child: CachedNetworkImage(
-                imageUrl: widget.issuePages[pagePosition],
-                placeholder: (context, url) => CircularProgressIndicator(),
+            controller: pageController,
+            itemCount: widget.issuePages.length,
+            itemBuilder: (context, index) {
+              return CachedNetworkImage(
+                imageUrl: widget.issuePages[index],
+                imageBuilder: (context, imageProvider) => PhotoView(
+                  imageProvider: imageProvider,
+                ),
+                placeholder: (context, url) => Center(
+                  child: SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: CircularProgressIndicator(color: Colors.grey),
+                  ),
+                ),
                 errorWidget: (context, url, error) => Icon(Icons.error),
-              ),
-            );
-          }
-
-
+              );
+            },
+            onPageChanged: (int index) {
+              setState(() {
+                pagePosition = index;
+              });
+            },
+          ),
+        ),
       ),
-
+      bottomNavigationBar: buildBottomNavBar(),
     );
   }
 
-  Container buildBottomNavBar(int? pagePosition, int? pageCount) {
-    return Container(
-      color: Colors.black.withOpacity(.1),
-      height: 56,
-      width: double.infinity,
-      child: Center(child: Text('$pagePosition / $pageCount')),
-
-
+  Widget buildBottomNavBar() {
+    return AnimatedContainer(
+      height: _isBottomNavBarVisible ? kToolbarHeight : 0,
+      duration: const Duration(milliseconds: 200),
+      child: Container(
+        color: Colors.black.withOpacity(0.1),
+        height: 56,
+        width: double.infinity,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              onPressed: () {
+                if (pageController.page! > 0) {
+                  pageController.previousPage(
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              },
+              icon: Icon(Icons.arrow_back_ios),
+            ),
+            Text(
+              '${pagePosition + 1} / ${widget.issuePages.length}',
+              style: TextStyle(fontSize: 16),
+            ),
+            IconButton(
+              onPressed: () {
+                if (pageController.page! < widget.issuePages.length - 1) {
+                  pageController.nextPage(
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              },
+              icon: Icon(Icons.arrow_forward_ios),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
-
-
-AppBar _buildBuildAppBar(issueName,context) {
+AppBar _buildBuildAppBar(issueName, context) {
   return AppBar(
-    //toolbarHeight: height,
     leading: IconButton(
       onPressed: () => Navigator.of(context).pop(),
-      icon: const Icon(Icons.arrow_back_ios_outlined,
+      icon: const Icon(
+        Icons.arrow_back_ios_outlined,
         color: mainScreenProperties.fontColor,
       ),
-
-
     ),
     elevation: appBarProperties.elevation,
     backgroundColor: appBarProperties.color,
-    title: Text('$issueName',style: TextStyle(
-        color: Colors.black
-    ),) ,//appBarProperties.title,
+    title: Text(
+      '$issueName',
+      style: TextStyle(
+        color: Colors.black,
+      ),
+    ),
     centerTitle: true,
-
   );
 }

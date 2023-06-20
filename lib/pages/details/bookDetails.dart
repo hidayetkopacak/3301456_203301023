@@ -4,21 +4,26 @@ import 'package:my_digital_library/constants/constants.dart';
 import 'widgets/bookDetailSingle.dart';
 
 
-class bookDetailPage extends StatelessWidget {
-  final Map comicData;
 
-  const bookDetailPage({required this.comicData,Key? key}) : super(key: key);
+
+class bookDetailPageScrap extends StatelessWidget {
+  final Future<Map<dynamic, dynamic>> comicData;
+
+  const bookDetailPageScrap({required this.comicData, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: mainScreenProperties.backgroundColor,
-
       appBar: _buildAppBar(context),
-      body: bookDetailSingle(comicData: comicData,),
+      body: bookDetailSingleScrap(comicData: comicData),
     );
   }
 }
+
+
+
+
 
 AppBar _buildAppBar(BuildContext context){
   return AppBar(

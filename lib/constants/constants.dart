@@ -14,11 +14,14 @@ class appBarProperties{
   style: appBarTextStyle
   );
 
-  AppBar? buildSideAppBar(title){
+  AppBar? buildSideAppBar(title, {String automaticallyImplyLeading = ''}){
     return AppBar(
+      automaticallyImplyLeading: automaticallyImplyLeading.isNotEmpty ? true : false,
+      iconTheme: IconThemeData(color: Colors.black),
       elevation: elevation,
       backgroundColor: color,
       centerTitle: true,
+
 
       title: Text(
         title,
@@ -37,6 +40,7 @@ class appBarProperties{
 // Ana ekran Main Screen Scaffold içi
 class mainScreenProperties{
   static Color backgroundColor = Colors.white;
+
   static Color backgroundColorSecond = Colors.black.withOpacity(.1);
   static Color backgroundColorThird = Colors.black.withOpacity(.5);
   static Color cardColor = Colors.transparent;

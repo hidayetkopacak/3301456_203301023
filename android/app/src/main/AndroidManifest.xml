@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.my_digital_library">
    <application
-        android:label="my_digital_library"
+        android:label="DigiLib"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

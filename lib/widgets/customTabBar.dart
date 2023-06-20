@@ -9,7 +9,7 @@ class customTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height/20;
+    final double height = 35;//MediaQuery.of(context).size.height/20;
     return  _buildContainer(width, height);
 
   }
