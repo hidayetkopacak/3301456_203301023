@@ -37,7 +37,7 @@ class _SourcesHomeState extends State<SourcesHome> {
   void initState() {
     super.initState();
     _searchController.addListener(_searchControllerListener);
-    getData();//checkCacheData();
+    checkCacheData();
   }
   @override
   void dispose() {
@@ -158,11 +158,13 @@ class _SourcesHomeState extends State<SourcesHome> {
       final prefs = await SharedPreferences.getInstance();
       final collectionRef = FirebaseFirestore.instance.collection("ComicsMode");
       final querySnapshot = await collectionRef.get();
+      print(querySnapshot);
 
       if (querySnapshot.size > 0) {
         final List<Map<String, dynamic>> comicDatas = [];
 
         for (final doc in querySnapshot.docs) {
+
           if (doc.id == '000a-deneme') {
             continue;
           }
@@ -185,6 +187,8 @@ class _SourcesHomeState extends State<SourcesHome> {
         // Veritabanında hiç kayıt yoksa yapılacak işlemler
       }
     } catch (e) {
+      print(e);
+      getData();
       // Hata durumunda yapılacak işlemler
       //print('Veri okuma hatası: $e');
     }
@@ -370,7 +374,7 @@ class _SourcesHomeState extends State<SourcesHome> {
       );
 
     }else{
-      return Container(
+      return parsedData.length!= 0 ? Container(
 
         child: Padding(
           padding: reponsiveFunc(currentWidth) == 4 ? EdgeInsets.fromLTRB(200, 0, 200, 0 ): EdgeInsets.all(0),
@@ -429,7 +433,7 @@ class _SourcesHomeState extends State<SourcesHome> {
             ),
           ),
         ),
-      );
+      ) : Container(width:double.infinity,height:double.infinity,child: Center(child: Text('[cloud_firestore/resource-exhausted] Quota exceeded. 50.000 okuma limiti geçildi. Sitenin kendisinden veri çekmeye hazırlanılıyor...')));
     }
 
   }

@@ -92,7 +92,7 @@ class _homePageState extends State<homePage> {
                 ),
                 Container(
                   //margin: EdgeInsets.fromLTRB(40, 0, 0, 0),
-                  child: Text('$email: $width',style: TextStyle(
+                  child: Text('$email',style: TextStyle(
                     color: Colors.black.withOpacity(.5),
                     fontSize: 13,
                     fontWeight: FontWeight.normal,
